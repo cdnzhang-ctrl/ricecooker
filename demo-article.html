@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Readable Mark Team">
+    <meta name="description" content="A local test article for the Claude Code-style reader extension.">
+    <title>Designing A Warm Terminal Reader</title>
+    <style>
+      body {
+        margin: 0;
+        background: #fafafa;
+        color: #202020;
+        font-family: Arial, sans-serif;
+      }
+
+      header,
+      nav,
+      aside,
+      footer {
+        background: #eeeeee;
+        padding: 18px 8vw;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 1fr 280px;
+        gap: 48px;
+        max-width: 1120px;
+        margin: 40px auto;
+        padding: 0 24px;
+      }
+
+      article {
+        font-size: 18px;
+        line-height: 1.65;
+      }
+
+      .ad {
+        border: 2px dashed #888;
+        padding: 18px;
+        margin: 24px 0;
+        color: #666;
+      }
+
+      pre {
+        overflow: auto;
+        background: #1f1f1f;
+        color: white;
+        padding: 18px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <strong>Example Magazine</strong>
+      <nav>Home / Essays / Engineering</nav>
+    </header>
+
+    <main class="layout">
+      <article>
+        <h1>Designing A Warm Terminal Reader</h1>
+        <p class="byline">By Readable Mark Team</p>
+        <time datetime="2026-06-12">June 12, 2026</time>
+
+        <p>Reading on the web often feels like walking through a market where every stall is shouting at once. A reader mode should quiet the page without flattening the author's work into a lifeless slab of text.</p>
+
+        <div class="ad">Sponsored message that should disappear in reader mode.</div>
+
+        <h2>The interface should feel like a tool</h2>
+        <p>The Claude Code visual language gives us a useful direction: warm paper, precise monospace controls, editorial type, and a touch of terminal culture. It feels technical without becoming cold.</p>
+
+        <blockquote>
+          A good reader view is not empty. It is composed enough that the page can finally breathe.
+        </blockquote>
+
+        <h2>Code-heavy pages need special care</h2>
+        <p>Technical articles often contain code blocks, inline identifiers like <code>chrome.storage.local</code>, and structured lists. These details need to survive extraction.</p>
+
+        <pre><code>const settings = {
+  theme: "paper",
+  width: "standard",
+  type: "editorial"
+};</code></pre>
+
+        <h3>Useful reader controls</h3>
+        <ul>
+          <li>Change width without losing place.</li>
+          <li>Switch between editorial and mono body text.</li>
+          <li>Copy the cleaned article as Markdown.</li>
+        </ul>
+      </article>
+
+      <aside>
+        <h2>Sidebar</h2>
+        <p>This page furniture should not become part of the reader article.</p>
+      </aside>
+    </main>
+
+    <footer>Related posts, sharing links, and other footer clutter.</footer>
+  </body>
+</html>

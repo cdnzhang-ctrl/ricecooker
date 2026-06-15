@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ricecooker</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main class="popup-shell">
+      <header class="popup-header">
+        <div>
+          <p class="eyebrow">~/ricecooker</p>
+          <h1><span class="logotype-action">Read w/</span> <span class="logotype-name">ricecooker</span></h1>
+        </div>
+        <span class="status-dot" aria-hidden="true"></span>
+      </header>
+
+      <section class="command-row" aria-label="Reader commands">
+        <button id="toggleReader" class="primary-button" type="button">Run Reader</button>
+        <button id="copyMarkdown" class="ghost-button" type="button">Copy MD</button>
+      </section>
+
+      <section class="controls" aria-label="Reader settings">
+        <label>
+          <span>Theme</span>
+          <select id="theme">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Width</span>
+          <select id="width">
+            <option value="narrow">Narrow</option>
+            <option value="standard">Standard</option>
+            <option value="wide">Wide</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Type</span>
+          <select id="type">
+            <option value="editorial">Editorial</option>
+            <option value="mono">Mono</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Size</span>
+          <select id="size">
+            <option value="small">Small</option>
+            <option value="default">Default</option>
+            <option value="large">Large</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Code</span>
+          <select id="code">
+            <option value="normal">Normal</option>
+            <option value="contrast">High contrast</option>
+          </select>
+        </label>
+      </section>
+
+      <p id="status" class="status-line">Ready. Command+Shift+Y toggles the reader.</p>
+    </main>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
