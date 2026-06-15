@@ -14,6 +14,9 @@
     code: "normal"
   };
   const SETTINGS_KEY = "readableMarkSettings";
+  const SITE_EXTRACTORS = [
+    extractLitChartsArticle
+  ];
   const ALLOWED_TAGS = new Set([
     "a",
     "b",
@@ -141,6 +144,11 @@
       return articleFromSelection(selectedText);
     }
 
+    const siteArticle = extractSiteSpecificArticle();
+    if (siteArticle) {
+      return siteArticle;
+    }
+
     const candidate = findBestCandidate();
     const article = {
       title: getTitle(candidate),
@@ -158,6 +166,119 @@
     }
 
     return article;
+  }
+
+  function extractSiteSpecificArticle() {
+    for (const extractor of SITE_EXTRACTORS) {
+      const article = extractor();
+      if (article && hasReadableContent(article.content)) {
+        return article;
+      }
+    }
+
+    return null;
+  }
+
+  function extractLitChartsArticle() {
+    if (!/(^|\.)litcharts\.com$/i.test(location.hostname)) {
+      return null;
+    }
+
+    const summaryAnalysis = document.querySelector(".summary-analysis");
+    if (!summaryAnalysis) {
+      return null;
+    }
+
+    const content = document.createElement("div");
+    const rows = [...summaryAnalysis.children].filter((child) => child.classList.contains("summary"));
+
+    rows.forEach((row) => {
+      const summaryText = row.querySelector(".summary-text.readable");
+      appendLitChartsBlock(content, summaryText);
+
+      row.querySelectorAll(".analysis-text[aria-hidden='false']").forEach((analysisText) => {
+        appendLitChartsBlock(content, analysisText);
+      });
+    });
+
+    pruneEmptyNodes(content);
+
+    const metadata = getLitChartsMetadata();
+
+    return {
+      title: metadata.title,
+      subtitle: metadata.subtitle,
+      author: "",
+      date: "",
+      site: location.hostname.replace(/^www\./, ""),
+      url: location.href,
+      content
+    };
+  }
+
+  function appendLitChartsBlock(content, source) {
+    if (!source || !source.textContent.trim()) {
+      return;
+    }
+
+    const clone = source.cloneNode(true);
+    clone.querySelectorAll([
+      ".active-themes",
+      ".active-quotes",
+      ".paywalled-content",
+      ".analysis-dialog",
+      ".analysis-text-dialog",
+      ".summary__a-plus-dialog",
+      ".a-plus-dialog",
+      ".a-plus-btn-container",
+      ".pdf-promo",
+      ".stretch-left-promo",
+      ".prev-next-links",
+      ".cite-this-page",
+      ".modal",
+      "[aria-hidden='true']"
+    ].join(",")).forEach((node) => node.remove());
+
+    normalizeLitChartsInlineMarkup(clone);
+    sanitizeAllowedMarkup(clone);
+
+    const paragraph = document.createElement("p");
+    while (clone.firstChild) {
+      paragraph.append(clone.firstChild);
+    }
+
+    if (paragraph.textContent.trim()) {
+      content.append(paragraph);
+    }
+  }
+
+  function normalizeLitChartsInlineMarkup(root) {
+    root.querySelectorAll("span.ital").forEach((node) => {
+      const emphasis = document.createElement("em");
+      emphasis.append(...node.childNodes);
+      node.replaceWith(emphasis);
+    });
+
+    root.querySelectorAll("span.bold").forEach((node) => {
+      const strong = document.createElement("strong");
+      strong.append(...node.childNodes);
+      node.replaceWith(strong);
+    });
+
+    root.querySelectorAll([
+      ".inline-character",
+      ".inline-symbol",
+      ".inline-simbol",
+      ".inline-popup-trigger"
+    ].join(",")).forEach((node) => {
+      node.replaceWith(...node.childNodes);
+    });
+  }
+
+  function getLitChartsMetadata() {
+    const title = normalizedText(document.querySelector(".component-title")) || getDocumentTitle();
+    const subtitle = normalizedText(document.querySelector(".component-subtitle"));
+    return { title, subtitle };
   }
 
   function articleFromSelection(text) {
@@ -283,33 +404,7 @@
       ".timestamp"
     ].join(",")).forEach((node) => node.remove());
 
-    [...clone.querySelectorAll("*")].forEach((node) => {
-      const tag = node.tagName.toLowerCase();
-      if (!ALLOWED_TAGS.has(tag)) {
-        node.replaceWith(...node.childNodes);
-        return;
-      }
-
-      [...node.attributes].forEach((attribute) => node.removeAttribute(attribute.name));
-
-      if (tag === "a") {
-        const href = node.href || node.getAttribute("href");
-        if (href) {
-          node.setAttribute("href", new URL(href, location.href).href);
-          node.setAttribute("target", "_blank");
-          node.setAttribute("rel", "noreferrer");
-        }
-      }
-
-      if (tag === "img") {
-        const source = node.currentSrc || node.src || node.getAttribute("src");
-        if (source) {
-          node.setAttribute("src", new URL(source, location.href).href);
-        }
-        node.setAttribute("alt", node.alt || "");
-        node.setAttribute("loading", "lazy");
-      }
-    });
+    sanitizeAllowedMarkup(clone);
 
     const firstHeading = clone.querySelector("h1");
     if (firstHeading) {
@@ -319,6 +414,38 @@
 
     pruneEmptyNodes(clone);
     return clone;
+  }
+
+  function sanitizeAllowedMarkup(root) {
+    [...root.querySelectorAll("*")].forEach((node) => {
+      const tag = node.tagName.toLowerCase();
+      if (!ALLOWED_TAGS.has(tag)) {
+        node.replaceWith(...node.childNodes);
+        return;
+      }
+
+      const href = tag === "a" ? node.getAttribute("href") || node.href : "";
+      const source = tag === "img" ? node.currentSrc || node.src || node.getAttribute("src") : "";
+      const alt = tag === "img" ? node.alt || "" : "";
+
+      [...node.attributes].forEach((attribute) => node.removeAttribute(attribute.name));
+
+      if (tag === "a") {
+        if (href) {
+          node.setAttribute("href", new URL(href, location.href).href);
+          node.setAttribute("target", "_blank");
+          node.setAttribute("rel", "noreferrer");
+        }
+      }
+
+      if (tag === "img") {
+        if (source) {
+          node.setAttribute("src", new URL(source, location.href).href);
+        }
+        node.setAttribute("alt", alt);
+        node.setAttribute("loading", "lazy");
+      }
+    });
   }
 
   function removeDuplicateMetadata(root, metadata) {
@@ -360,6 +487,11 @@
     root.innerHTML = `
       <div class="rm-loading">
         <p class="rm-kicker">~/ricecooker/article</p>
+        <pre class="rm-loading-ascii" aria-hidden="true">     )   (
+    (   )
+   .---------.
+   |  [===]  |
+   |_________|</pre>
         <h1>Parsing article...</h1>
         <pre>Extracting main content...
 Removing page noise...
@@ -380,7 +512,7 @@ Formatting text...</pre>
     root.innerHTML = `
       <header class="rm-toolbar">
         <div class="rm-brand">
-          <span class="rm-logotype"><span class="rm-logotype-action">Read w/</span> <span class="rm-logotype-name">ricecooker</span></span>
+          <img class="rm-logotype" src="${escapeAttribute(getAssetUrl("brand/ricecooker-lockup.svg"))}" alt="ricecooker">
           <small>~/ricecooker/article</small>
         </div>
         <nav class="rm-controls" aria-label="Reader controls">
@@ -631,6 +763,10 @@ Formatting text...</pre>
     return (node.innerText || node.textContent || "").replace(/\s+/g, " ").trim();
   }
 
+  function hasReadableContent(content, minimumLength = 160) {
+    return Boolean(content?.textContent.trim() && content.textContent.trim().length >= minimumLength);
+  }
+
   function normalizeComparableText(value) {
     return String(value || "")
       .replace(/\s+/g, " ")
@@ -677,5 +813,9 @@ Formatting text...</pre>
 
   function escapeAttribute(value) {
     return escapeHtml(value).replace(/`/g, "&#096;");
+  }
+
+  function getAssetUrl(path) {
+    return chrome.runtime?.getURL ? chrome.runtime.getURL(path) : path;
   }
 })();

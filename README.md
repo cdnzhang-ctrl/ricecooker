@@ -34,3 +34,7 @@ Use `STORE_LISTING.md` for the short description, detailed description, permissi
 - `content.js`: Article extraction, reader rendering, settings application, and Markdown copy.
 - `reader.css`: Claude Code-style reader overlay.
 - `demo-article.html`: Manual test fixture.
+- `brand/`: Active ricecooker logo, wordmark, pixel mark, and ASCII brand assets used by the extension UI.
+- `ricecooker-design assets/`: Source brand asset pack.
+- `DESIGN.md`: Product design principles, screen roles, brand direction, and interaction guidance.
+- `VISUAL_RULES.md`: Practical typography, color, layout, component, and visual QA rules.

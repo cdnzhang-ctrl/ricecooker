@@ -76,31 +76,10 @@ html.readable-mark-page-lock {
 }
 
 #readable-mark-root .rm-logotype {
-  display: inline-flex;
-  align-items: baseline;
-  gap: var(--rm-logo-gap);
-  color: var(--rm-logo-color);
-  font-size: clamp(23px, 1.8vw, 27px);
-  letter-spacing: 0;
-  line-height: 1;
-  text-rendering: geometricPrecision;
-  white-space: nowrap;
-  -webkit-font-smoothing: antialiased;
-}
-
-#readable-mark-root .rm-logotype-action {
-  color: var(--rm-logo-muted);
-  font-family: var(--rm-logo-action-font);
-  font-size: 0.86em;
-  font-weight: 500;
-  letter-spacing: var(--rm-logo-tracking-action);
-}
-
-#readable-mark-root .rm-logotype-name {
-  color: var(--rm-logo-color);
-  font-family: var(--rm-logo-name-font);
-  font-size: 1em;
-  font-weight: 600;
+  display: block;
+  width: clamp(142px, 13vw, 198px);
+  height: auto;
+  image-rendering: pixelated;
 }
 
 #readable-mark-root .rm-brand small,
@@ -415,7 +394,23 @@ html.readable-mark-page-lock {
   line-height: 0.95;
 }
 
-#readable-mark-root .rm-loading pre {
+#readable-mark-root .rm-loading-ascii {
+  width: max-content;
+  max-width: 100%;
+  margin: 12px 0 28px;
+  border: 1px solid color-mix(in srgb, var(--rm-button) 60%, transparent);
+  border-radius: 8px;
+  background: #16120e;
+  color: #d97757;
+  padding: 14px 18px;
+  overflow: hidden;
+  font-family: var(--rm-mono);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+#readable-mark-root .rm-loading pre:not(.rm-loading-ascii) {
   border-top: 1px solid var(--rm-rule);
   margin: 0;
   padding-top: 18px;

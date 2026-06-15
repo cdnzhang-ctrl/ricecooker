@@ -9,16 +9,24 @@
   <body>
     <main class="popup-shell">
       <header class="popup-header">
-        <div>
-          <p class="eyebrow">~/ricecooker</p>
-          <h1><span class="logotype-action">Read w/</span> <span class="logotype-name">ricecooker</span></h1>
-        </div>
-        <span class="status-dot" aria-hidden="true"></span>
+        <img class="brand-mark" src="brand/cooker-sprite.svg" alt="" aria-hidden="true">
+        <img class="brand-wordmark" src="brand/ricecooker-wordmark.svg" alt="ricecooker">
       </header>
 
+      <section class="brand-panel" aria-label="ricecooker terminal brand">
+        <img class="terminal-wordmark" src="brand/ricecooker-terminal.svg" alt="" aria-hidden="true">
+        <pre class="ascii-mark">     )   (
+    (   )
+   .---------.
+   |  [===]  |
+   |_________|
+
+$ ricecooker --read</pre>
+      </section>
+
       <section class="command-row" aria-label="Reader commands">
-        <button id="toggleReader" class="primary-button" type="button">Run Reader</button>
-        <button id="copyMarkdown" class="ghost-button" type="button">Copy MD</button>
+        <button id="toggleReader" class="primary-button" type="button">Open Reader</button>
+        <button id="copyMarkdown" class="ghost-button" type="button">Copy Markdown</button>
       </section>
 
       <section class="controls" aria-label="Reader settings">
@@ -65,7 +73,7 @@
         </label>
       </section>
 
-      <p id="status" class="status-line">Ready. Command+Shift+Y toggles the reader.</p>
+      <p id="status" class="status-line">Ready.</p>
     </main>
 
     <script src="popup.js"></script>

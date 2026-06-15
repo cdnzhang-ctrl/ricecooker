@@ -26,8 +26,8 @@ async function init() {
 
   const status = await sendMessage({ type: "READABLE_MARK_GET_STATUS" }, false);
   if (status?.active) {
-    setStatus("Reader active. Controls apply live.");
-    toggleButton.textContent = "Exit Reader";
+    setStatus("Reader active. Controls update live.");
+    toggleButton.textContent = "Close Reader";
   }
 }
 
@@ -35,7 +35,7 @@ async function updateSetting(field, value) {
   const settings = { ...(await loadSettings()), [field]: value };
   await chrome.storage.local.set({ readableMarkSettings: settings });
   await sendMessage({ type: "READABLE_MARK_APPLY_SETTINGS", settings }, false);
-  setStatus(`Updated ${field}: ${value}`);
+  setStatus(`${labelize(field)} set to ${labelize(value)}.`);
 }
 
 async function loadSettings() {
@@ -56,11 +56,11 @@ async function sendMessage(message, showErrors = true) {
   try {
     const response = await chrome.tabs.sendMessage(tab.id, message);
     if (message.type === "READABLE_MARK_TOGGLE") {
-      toggleButton.textContent = response?.active ? "Exit Reader" : "Run Reader";
+      toggleButton.textContent = response?.active ? "Close Reader" : "Open Reader";
       setStatus(response?.active ? "Reader active." : "Reader closed.");
     }
     if (message.type === "READABLE_MARK_COPY_MARKDOWN") {
-      setStatus(response?.copied ? "Clean Markdown copied." : "Run Reader before copying.");
+      setStatus(response?.copied ? "Markdown copied." : "Open Reader before copying.");
     }
     return response;
   } catch (_error) {
@@ -85,6 +85,10 @@ async function sendMessage(message, showErrors = true) {
 
 function setStatus(text) {
   statusEl.textContent = text;
+}
+
+function labelize(value) {
+  return value.charAt(0).toUpperCase() + value.slice(1).replace(/-/g, " ");
 }
 
 function normalizeSettings(settings) {
